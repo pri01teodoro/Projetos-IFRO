@@ -1,0 +1,597 @@
+openapi: 3.0.3
+info:
+  title: API do Observatório de Políticas Públicas
+  description: API para controlar a lógica de negócio do site
+  version: 0.0.1
+  termsOfService: http://localhost:3030
+  contact:
+    name: developer
+    email: workguisantos@gmail.com
+  license:
+    name: "MIT"
+servers:
+  # Pode ter quantos servidores forem necessário (Produção + Teste)
+  - url: http://localhost:3030
+    description: API de teste
+
+tags:
+  - name: Usuários
+    description: Usuários do Observatório de Políticas Públicas
+    externalDocs:
+      description: Leia mais 
+      url: http://swagger.io
+  - name: Publicações
+    description: Publicações da plataforma
+    externalDocs:
+      description: Leia mais 
+      url: http://swagger.io
+
+paths:
+  #Rotas para usuário
+  /usuarios:
+    get:
+      tags:
+        - Usuários
+      summary: Recupera todos os usuários
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usuarios'
+                
+        '404':
+          description: Nenhum usuário encontrado
+          content:
+            application/json:
+              example: Not Found
+    post:
+      tags:
+        - Usuários
+      summary: Cadastra um novo usuário
+      requestBody: 
+        content: 
+          application/json:
+            schema:
+               $ref: '#/components/schemas/usuario'  
+                
+      responses: 
+        '201':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usuarios'
+        '404':
+          description: Sem acesso ao banco
+          content:
+            application/json:
+              example: Not Found
+        '409':
+          description: Usuário já existente
+          content:
+            application/json:
+              example: Conflict
+              
+  /usuarios/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: 
+          type: integer
+        required: true
+    get:
+      tags:
+        - Usuários
+      summary: Recupera um usuário por ID
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/usuario'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              example: Not Found
+  
+    put:
+      tags:
+        - Usuários
+      summary: Atualiza um usuário pelo ID
+      requestBody:
+        description: Atualiza um usuário pelo ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usuario'
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usuario'
+                
+        '404':
+          description: Nenhum usuário encontrado
+          content:
+            application/json:
+              example: Not Found
+    delete:
+      tags:
+        - Usuários
+      summary: Apaga um usuário pelo ID
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              example: Deleted
+                
+        '404':
+          description: Nenhum usuário encontrado
+          content:
+            application/json:
+              example: Not Found
+
+  #Rotas para login
+  /login:
+    get:
+      tags:
+        - Login
+      summary: Recupera todos os logins
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/logins"
+        '404':
+          description: login não encontrado
+          content:
+            application/json:
+              example: "Not Found"
+    post:
+      tags:
+        - Login
+      summary: Cadastra um novo login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                senha:
+                  type: string
+      responses:
+        '201':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                # usando por conponente
+                $ref: "#/components/schemas/login"
+        '404':
+          description: Login não encontrado
+          content:
+            application/json:
+              example: "Not Found"
+              
+  /login/{id}:
+    # O parâmentro nessa área permitirá utilizá-lo para todos os verbos nesta rota
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+
+    get:
+      tags:
+        - Login
+      summary: Recupera login por ID
+      # Lugar possível de colocar o parametro, mas servirá apenas para o verbo get
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                # usando por conponente
+                $ref: "#/components/schemas/login"
+        '404':
+          description: login não encontrado
+          content:
+            application/json:
+              example: "Not Found"
+    
+    put:
+      tags:
+        - Login
+      summary: Atualiza login por ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                senha:
+                  type: string
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                # usando por conponente
+                $ref: "#/components/schemas/login"
+        '404':
+          description: login não encontrado
+          content:
+            application/json:
+              example: "Not Found"
+    delete:
+      tags:
+        - Login
+      summary: Apaga um login
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json:
+              example: Success
+        '404':
+          description: Login não encontrado
+          content:
+            application/json:
+              example: "Not Found"
+              
+  #Rotas para publicações
+  /publicacoes:
+    get:
+      tags:
+        - Publicações
+      summary: Recupera todas as publicações
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/publicacoes"
+        '404':
+          description: "Não foi possível acessar o banco de dados"
+          content:
+            application/json:
+              example: "Connection Error"
+    
+    post:
+      tags:
+        - Publicações
+      summary: Cadastra uma nova publicação
+      requestBody: 
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/publicacao_put"
+
+      responses:
+        '201':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/publicacao"
+
+        '404':
+          description: "Não foi possível inserir a publicação"
+          content:
+            application/json:
+              example: Not Found
+              
+        '409':
+          description: "Publicação existente"
+          content: 
+            application/json:
+              example: Conflict
+
+  /publicacoes/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema: 
+          type: integer
+        required: true
+    get:
+      tags:
+        - Publicações
+      summary: Recupera uma publicação por ID
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/publicacao'
+        '404':
+          description: "Publicação não encontrada"
+          content:
+            application/json:
+              example: Not Found
+    
+    put:
+      tags:
+        - Publicações
+      summary: Atualiza uma publicação por ID
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/publicacao_put'
+
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publicacao'
+                
+        '204':
+          description: "Sem alteração"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publicacao'
+                
+        '404':
+          description: "Publicação não encontrada"
+          content:
+            application/json:
+              example: Not Found
+              
+    delete:
+      tags:
+        - Publicações
+      summary: Apaga publicação por ID
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json: 
+              example: Deleted
+        '404':
+          description: "Publicação não encontrada"
+          content:
+            application/json:
+              example: Not Found
+
+/parceiros:
+    get:
+      tags:
+        - Parceiros
+      summary: Recupera todos os parceiros
+      responses:
+        '200':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/parceiros'
+        '404':
+          description: "Parceiro não encontrado"
+          content:
+            application/json:
+              example: Not Found
+     
+    post:
+      tags:
+        - Parceiros
+      summary: Cadastra um novo parceiro
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/parceiros'
+      responses:
+        '201':
+          description: "Sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/parceiros'
+       
+        '404':
+          description: "Sem acesso ao banco"
+          content:
+            application/json:
+              example: Not Found
+       
+        '409':
+          description: "Parceiro já existente"
+          content:
+            application/json:
+              example: Conflict
+
+/parceiros/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+    get:
+      tags:
+        - Parceiros
+      summary: Recupera parceiro por ID
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/parceiro'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              example: Not Found
+ 
+    put:
+      tags:
+        - Parceiros
+      summary: Atualiza um parceiro pelo ID
+      requestBody:
+        description: Atualiza um parceiro pelo ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/parceiro'
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/parceiro'
+               
+        '404':
+          description: Nenhum usuário encontrado
+          content:
+            application/json:
+              example: Not Found
+    delete:
+      tags:
+        - Parceiros
+      summary: Apaga um parceiro pelo ID
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              example: Deleted
+               
+        '404':
+          description: Nenhum parceiro encontrado
+          content:
+            application/json:
+              example: Not Found
+
+security:
+  - auth: []
+
+components:
+  schemas:
+    #Elementos para usuário
+    usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome_usuario:
+          type: string
+        senha:
+          type: string
+        formacao:
+          type: string
+        nome:
+          type: string
+        inativo:
+          type: boolean
+        adm:
+          type: boolean
+        path_photo:
+          type: string
+    usuarios:
+      type: array
+      
+      items: 
+        $ref: '#/components/schemas/usuario'
+
+    #Elementos para login
+    login:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        senha:
+          type: string
+        ativo:
+          type: boolean
+          # Lembrando que string pode ter outros formatos Ex. (format: date-time; format: currency)
+    logins:
+      type: array
+      items:
+        $ref: "#/components/schemas/login"
+
+    #Elementos para publicações
+    publicacao:
+      type: object
+      properties:
+        id:
+          type: integer
+        data:
+          type: string
+        titulo:
+          type: string
+        registro:
+          type: string
+        tipo:
+          type: string
+        usuarioId:
+          type: integer
+
+    publicacao_put:
+      type: object
+      properties:
+        data:
+          type: string
+        titulo:
+          type: string
+        registro:
+          type: string
+        tipo:
+          type: string
+        usuarioId:
+          type: integer
+
+    publicacoes:
+      type: array
+      items:
+        $ref: "#/components/schemas/publicacao"
+
+    parceiro:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        ativo:
+          type: boolean
+        caminho_logo:
+          type: string
+
+    parceiros:
+      type: array
+      items:
+        $ref: "#/components/schemas/parceiro"
+
+  securitySchemes:
+    auth:
+      type: http
+      # tipo Token do portador
+      scheme: bearer
+      bearerFormat: JWT
